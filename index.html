@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tag Trends (2023-2025)</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 30px 20px;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #ff6b6b, #845ef7, #20c997, #ffd43b);
+      background-size: 400% 400%;
+      animation: gradientAnimation 10s infinite alternate;
+      color: #fff;
+      text-align: center;
+      min-height: 100vh;
+    }
+
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+
+    h1 {
+      font-size: 3rem;
+      color: #fffa65;
+      text-shadow: 3px 3px 10px rgba(255, 250, 101, 0.8);
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      color: #ffffffcc;
+      font-size: 1.8rem;
+      margin-top: 30px;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    canvas {
+      margin-top: 20px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 10px 40px rgba(255, 255, 255, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    canvas:hover {
+      transform: scale(1.03);
+      box-shadow: 0 15px 50px rgba(255, 255, 255, 0.4);
+    }
+
+    /* Stylish Scrollbar */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 250, 101, 0.8);
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Trend of Tags Over Time</h1>
+  <h2>Top 15 Programming Tags (Usage in % by Year)</h2>
+  <canvas id="tagChart" width="1000" height="500"></canvas>
+
+  <script>
+    async function fetchData() {
+      const response = await fetch('/data'); // Replace with your actual data source
+      return await response.json();
+    }
+
+    async function createChart() {
+      const data = await fetchData();
+      const years = Object.keys(data);
+      const tags = Object.keys(data[years[0]]);
+
+      const colors = [
+        '#ff6b6b', '#4dabf7', '#845ef7', '#ffd43b', '#20c997',
+        '#5c7cfa', '#ff922b', '#dee2e6', '#c2255c', '#15aabf',
+        '#f06595', '#63e6be', '#1c7ed6', '#fcc419', '#9c36b5'
+      ];
+
+      const datasets = tags.map((tag, i) => ({
+        label: tag,
+        data: years.map(year => data[year][tag] || 0),
+        borderColor: colors[i % colors.length],
+        backgroundColor: colors[i % colors.length] + '66',
+        fill: false,
+        borderWidth: 2,
+        tension: 0.4,
+        pointRadius: 4,
+        pointHoverRadius: 6
+      }));
+
+      new Chart(document.getElementById('tagChart'), {
+        type: 'line',
+        data: {
+          labels: years,
+          datasets: datasets
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Tag Usage Trends (2023 - 2025)',
+              color: '#ffffff',
+              font: {
+                size: 20,
+                weight: 'bold'
+              },
+              padding: {
+                top: 10,
+                bottom: 25
+              }
+            },
+            legend: {
+              labels: {
+                color: '#e0e0e0',
+                font: {
+                  size: 12
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Year',
+                color: '#ffffff'
+              },
+              ticks: { color: '#dddddd' },
+              grid: {
+                color: '#ffffff22'
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Usage (%)',
+                color: '#ffffff'
+              },
+              ticks: {
+                color: '#dddddd',
+                callback: value => value + '%'
+              },
+              grid: {
+                color: '#ffffff22'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    createChart();
+  </script>
+</body>
+</html>
